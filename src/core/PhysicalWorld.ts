@@ -5,6 +5,8 @@ import {
   RigidBodyDesc,
   RigidBody,
   Collider,
+  Vector,
+  JointData,
 } from "@dimforge/rapier3d";
 
 interface BoxShape {
@@ -61,18 +63,32 @@ export default class PhysicalWorld {
     return this._instance;
   }
 
-  createObject(params: PhysicalObjectParams): Collider {
+  createObject(params: PhysicalObjectParams): {
+    collider: Collider;
+    rigidBody?: RigidBody;
+  } {
     let rigidBody: RigidBody | undefined;
     const rigidBodyDesc = this.createRigidBodyDesc(params);
     if (rigidBodyDesc) {
       rigidBody = this._instance.createRigidBody(rigidBodyDesc);
     }
+
     const collider: Collider = this._instance.createCollider(
       this.createColliderDesc(params),
       rigidBody,
     );
     // collider.setActiveEvents(RAPIER.ActiveEvents.COLLISION_EVENTS);
-    return collider;
+    return { collider, rigidBody };
+  }
+
+  createRevoluteJointData(
+    anchor1: Vector,
+    anchor2: Vector,
+    axis: Vector,
+  ): JointData {
+    const jointParams = RAPIER.JointData.revolute(anchor1, anchor2, axis);
+
+    return jointParams;
   }
 
   update() {
@@ -107,9 +123,9 @@ export default class PhysicalWorld {
       default:
         return;
     }
-
     bodyDesc.setTranslation(x, y, z);
-    // bodyDesc.setCcdEnabled(true);
+
+    bodyDesc.setCcdEnabled(true);
 
     return bodyDesc;
   }

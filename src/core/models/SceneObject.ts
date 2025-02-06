@@ -29,6 +29,7 @@ export default class SceneObject {
   private setMesh() {
     this._mesh = new THREE.Mesh(this.geometry, this.material);
 
-    this.scene.add(this.mesh);
+    this._mesh.castShadow = true;
+    this.scene.add(this._mesh);
   }
 }

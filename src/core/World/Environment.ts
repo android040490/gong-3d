@@ -40,10 +40,16 @@ export default class Environment {
     // directional light
     this.sunLight = new THREE.DirectionalLight("#ffffff", 4);
     this.sunLight.castShadow = true;
-    this.sunLight.shadow.camera.far = 15;
-    this.sunLight.shadow.mapSize.set(1024, 1024);
+    this.sunLight.shadow.camera.left = -20;
+    this.sunLight.shadow.camera.right = 20;
+    this.sunLight.shadow.camera.top = 20;
+    this.sunLight.shadow.camera.bottom = -20;
+    this.sunLight.shadow.camera.near = 1;
+    this.sunLight.shadow.camera.far = 200;
+    // this.sunLight.shadow.mapSize.set(1024, 1024);
     this.sunLight.shadow.normalBias = 0.05;
-    this.sunLight.position.set(3.5, 2, -1.25);
+    // this.sunLight.position.set(3.5, 2, -1.25).multiplyScalar(100);
+    // this.sunLight.shadow.camera.position.set(3.5, 2, -1.25).multiplyScalar(100);
     this.scene.add(this.sunLight);
     // ambient light
     this.ambientLight = new THREE.AmbientLight("#ffffff", 0.05);
@@ -116,7 +122,8 @@ export default class Environment {
       this.phi,
       this.theta,
     );
-    this.sunLight.position.copy(sunPosition);
+    this.sunLight.position.copy(sunPosition.clone().multiplyScalar(50));
+
     this.sunLight.intensity = 4 * alpha;
 
     this.sky.material.uniforms.sunPosition.value = sunPosition;
