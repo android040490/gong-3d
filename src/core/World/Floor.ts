@@ -32,7 +32,7 @@ export default class Floor {
       position: { x: 0, y: -0.5, z: 0 },
     });
     collider.setTranslation({ x: 0, y: -0.25, z: 0 });
-    collider.setFriction(1);
+    // collider.setFriction(1);
   }
 
   private init(): void {

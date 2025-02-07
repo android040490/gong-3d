@@ -16,7 +16,7 @@ export default class Environment {
   private sky!: Sky;
   private debugFolder?: GUI;
   private phi = THREE.MathUtils.degToRad(80);
-  private theta = THREE.MathUtils.degToRad(120);
+  private theta = THREE.MathUtils.degToRad(50);
 
   constructor() {
     this.experience = new Experience();

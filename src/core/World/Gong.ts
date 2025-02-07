@@ -10,6 +10,11 @@ export default class Gong extends Entity {
   private resources: Resources;
   private baulkColorTexture?: THREE.Texture;
   private baulkNormalTexture?: THREE.Texture;
+  private plateColorTexture?: THREE.Texture;
+  private plateNormalTexture?: THREE.Texture;
+  private plateAmbientOcclusionTexture?: THREE.Texture;
+  private plateMetallicTexture?: THREE.Texture;
+  private plateRoughnessTexture?: THREE.Texture;
   private physicalWorld: PhysicalWorld;
 
   constructor() {
@@ -29,14 +34,31 @@ export default class Gong extends Entity {
   }
 
   private async loadTextures(): Promise<void> {
-    const [baulkColorTexture, baulkNormalTexture] =
-      await this.resources.loadTextures([
-        "textures/baulk/color.jpg",
-        "textures/baulk/normal.jpg",
-      ]);
+    const [
+      baulkColorTexture,
+      baulkNormalTexture,
+      plateColorTexture,
+      plateNormalTexture,
+      plateMetallicTexture,
+      plateRoughnessTexture,
+      plateAmbientOcclusionTexture,
+    ] = await this.resources.loadTextures([
+      "textures/baulk/color.jpg",
+      "textures/baulk/normal.jpg",
+      "textures/gong-plate-2/color.jpg",
+      "textures/gong-plate-2/normal.jpg",
+      "textures/gong-plate-2/metallic.jpg",
+      "textures/gong-plate-2/roughness.jpg",
+      "textures/gong-plate-2/ambientOcclusion.jpg",
+    ]);
 
     this.baulkColorTexture = baulkColorTexture;
     this.baulkNormalTexture = baulkNormalTexture;
+    this.plateColorTexture = plateColorTexture;
+    this.plateNormalTexture = plateNormalTexture;
+    this.plateMetallicTexture = plateMetallicTexture;
+    this.plateRoughnessTexture = plateRoughnessTexture;
+    this.plateAmbientOcclusionTexture = plateAmbientOcclusionTexture;
   }
 
   private init(): void {
@@ -54,6 +76,36 @@ export default class Gong extends Entity {
 
     if (this.baulkNormalTexture) {
       this.baulkNormalTexture.wrapT = THREE.RepeatWrapping;
+    }
+    if (this.plateColorTexture) {
+      this.plateColorTexture.colorSpace = THREE.SRGBColorSpace;
+      this.plateColorTexture.repeat.set(2, 2);
+      this.plateColorTexture.wrapS = THREE.RepeatWrapping;
+      this.plateColorTexture.wrapT = THREE.RepeatWrapping;
+    }
+    if (this.plateNormalTexture) {
+      this.plateNormalTexture.colorSpace = THREE.SRGBColorSpace;
+      this.plateNormalTexture.repeat.set(2, 2);
+      this.plateNormalTexture.wrapS = THREE.RepeatWrapping;
+      this.plateNormalTexture.wrapT = THREE.RepeatWrapping;
+    }
+    if (this.plateRoughnessTexture) {
+      this.plateRoughnessTexture.colorSpace = THREE.SRGBColorSpace;
+      this.plateRoughnessTexture.repeat.set(2, 2);
+      this.plateRoughnessTexture.wrapS = THREE.RepeatWrapping;
+      this.plateRoughnessTexture.wrapT = THREE.RepeatWrapping;
+    }
+    if (this.plateMetallicTexture) {
+      this.plateMetallicTexture.colorSpace = THREE.SRGBColorSpace;
+      this.plateMetallicTexture.repeat.set(2, 2);
+      this.plateMetallicTexture.wrapS = THREE.RepeatWrapping;
+      this.plateMetallicTexture.wrapT = THREE.RepeatWrapping;
+    }
+    if (this.plateAmbientOcclusionTexture) {
+      this.plateAmbientOcclusionTexture.colorSpace = THREE.SRGBColorSpace;
+      this.plateAmbientOcclusionTexture.repeat.set(2, 2);
+      this.plateAmbientOcclusionTexture.wrapS = THREE.RepeatWrapping;
+      this.plateAmbientOcclusionTexture.wrapT = THREE.RepeatWrapping;
     }
   }
 
@@ -73,7 +125,7 @@ export default class Gong extends Entity {
         rigidBodyType: "fixed",
         position,
         rotation,
-        geometry: new THREE.CylinderGeometry(0.2, 0.2, 10, 32),
+        geometry: new THREE.CylinderGeometry(0.2, 0.2, 10, 16),
         material: new THREE.MeshStandardMaterial({
           map: this.baulkColorTexture,
           normalMap: this.baulkNormalTexture,
@@ -86,14 +138,20 @@ export default class Gong extends Entity {
 
   private createPlate(): void {
     const plate = new PhysicalEntity({
-      shape: { type: "cylinder", radius: 1, height: 0.2 },
-      density: 10,
+      shape: { type: "cylinder", radius: 3, height: 0.2 },
+      density: 30,
       rigidBodyType: "dynamic",
-      position: { x: 0, y: 8.7, z: 0 },
-      geometry: new THREE.CylinderGeometry(1, 1, 0.2, 32),
+      position: { x: 0, y: 4.7, z: 0 },
+      geometry: new THREE.CylinderGeometry(0, 3, 0.2, 64, 128, true),
       material: new THREE.MeshStandardMaterial({
-        map: this.baulkColorTexture,
-        normalMap: this.baulkNormalTexture,
+        map: this.plateColorTexture,
+        normalMap: this.plateNormalTexture,
+        roughnessMap: this.plateRoughnessTexture,
+        metalnessMap: this.plateMetallicTexture,
+        aoMap: this.plateAmbientOcclusionTexture,
+        roughness: 0.5,
+        metalness: 0.5,
+        side: THREE.DoubleSide,
       }),
       rotation: { x: 1, y: 0, z: 0, w: Math.PI / 2 },
     });
@@ -102,7 +160,7 @@ export default class Gong extends Entity {
     if (plate.rigidBody && baulkRigidBody) {
       let x = { x: 1, y: 0, z: 0 };
       const jointParams = this.physicalWorld.createRevoluteJointData(
-        { x: 0, y: 1.3, z: 0 },
+        { x: 0, y: 3.3, z: 0 },
         { x: 0, y: 0, z: 0 },
         x,
       );
