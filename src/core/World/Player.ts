@@ -1,5 +1,5 @@
 import * as THREE from "three";
-// import Time from "../Utils/Time";
+import Time from "../Utils/Time";
 import Experience from "../Experience";
 import Camera from "../Camera";
 import World from "./World";
@@ -8,7 +8,7 @@ import PhysicalEntity from "../models/PhysicalEntity";
 import { KinematicCharacterController } from "@dimforge/rapier3d";
 
 export default class Player {
-  // private time: Time;
+  private time: Time;
   private camera: Camera;
   private world: World;
   private physicalWorld: PhysicalWorld;
@@ -19,13 +19,13 @@ export default class Player {
   private moveBackward = false;
   private moveRight = false;
   private canJump = true;
-  // private velocity = new THREE.Vector3();
-  // private direction = new THREE.Vector3();
   private height = 3; // player height
+  private velocity = new THREE.Vector3();
+  private speed = 1;
 
   constructor() {
     const experience = new Experience();
-    // this.time = experience.time;
+    this.time = experience.time;
     this.camera = experience.camera;
     this.world = experience.world;
     this.physicalWorld = experience.physicalWorld;
@@ -37,71 +37,49 @@ export default class Player {
 
   update() {
     const controls = this.camera.controls;
-    // const delta = this.time.delta / 1000;
+    const delta = this.time.delta / 1000;
 
     if (controls.isLocked === true) {
-      // this.velocity.x -= this.velocity.x * 10.0 * delta;
-      // this.velocity.z -= this.velocity.z * 10.0 * delta;
+      this.velocity.z -= this.velocity.z * 10.0 * delta;
+      this.velocity.x -= this.velocity.x * 10.0 * delta;
+      // this.velocity.x =
+      //   Math.abs(this.velocity.x) < 0.000001 ? 0 : this.velocity.x;
+      // this.velocity.z =
+      //   Math.abs(this.velocity.z) < 0.000001 ? 0 : this.velocity.z;
 
-      // this.velocity.y -= 9.8 * 70.0 * delta; // 100.0 = mass
-      // this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
-      // this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
-      // this.direction.normalize(); // this ensures consistent movements in all directions
+      const direction = new THREE.Vector3();
 
-      // if (this.moveForward || this.moveBackward)
-      //   this.velocity.z -= this.direction.z * 400.0 * delta;
-      // if (this.moveLeft || this.moveRight)
-      //   this.velocity.x -= this.direction.x * 400.0 * delta;
+      direction.z = Number(this.moveBackward) - Number(this.moveForward);
+      direction.x = Number(this.moveRight) - Number(this.moveLeft);
+      direction.normalize(); // this ensures consistent movements in all directions
 
-      // if (onObject === true) {
-      //   this.velocity.y = Math.max(0, this.velocity.y);
-      //   canJump = true;
-      // }
-
-      // controls.moveRight(-this.velocity.x * delta);
-      // controls.moveForward(-this.velocity.z * delta);
-
-      // controls.object.position.y += this.velocity.y * delta; // new behavior
-
-      // if (controls.object.position.y < this.height) {
-      //   this.velocity.y = 0;
-      //   controls.object.position.y = this.height;
-
-      //   this.canJump = true;
-      // }
-
-      let movement = new THREE.Vector3();
-
-      if (this.moveForward) {
-        movement.z -= 1;
-      }
-      if (this.moveBackward) {
-        movement.z += 1;
-      }
-      if (this.moveLeft) {
-        movement.x -= 1;
-      }
-      if (this.moveRight) {
-        movement.x += 1;
+      if (this.moveForward || this.moveBackward) {
+        this.velocity.z += direction.z * 2 * delta * this.speed;
       }
 
-      movement
+      if (this.moveLeft || this.moveRight) {
+        this.velocity.x += direction.x * 2 * delta * this.speed;
+      }
+
+      const movement = this.velocity
+        .clone()
         .normalize()
         .applyQuaternion(this.camera.instance.quaternion)
-        .multiplyScalar(0.3); // The movement we would like to apply if there wasn’t any obstacle.
+        .multiplyScalar(this.velocity.length());
 
       this.characterController.computeColliderMovement(
         this.body.collider,
         { x: movement.x, y: 0, z: movement.z }, // The collider we would like to move.
       );
 
-      // console.log(this.characterController.computedGrounded());
       // Read the result.
       let correctedMovement = this.characterController.computedMovement();
 
-      const newPosition = new THREE.Vector3()
-        .copy(this.body.rigidBody.translation())
-        .add(correctedMovement);
+      const prevPosition = new THREE.Vector3().copy(
+        this.body.rigidBody.translation(),
+      );
+
+      const newPosition = prevPosition.add(correctedMovement);
 
       this.body.rigidBody.setTranslation(
         {
@@ -111,7 +89,7 @@ export default class Player {
         },
         true,
       );
-      this.camera.instance.position.set(
+      this.camera.controls.object.position.set(
         newPosition.x,
         newPosition.y + 1,
         newPosition.z,
@@ -164,6 +142,9 @@ export default class Player {
       case "KeyD":
         this.moveRight = false;
         break;
+
+      case "ShiftLeft":
+        this.speed = 1;
     }
   }
 
@@ -191,7 +172,6 @@ export default class Player {
 
       case "Space":
         if (this.canJump === true) {
-          // this.velocity.y += 550;
           this.body.rigidBody.applyImpulse(
             {
               x: 0,
@@ -203,6 +183,9 @@ export default class Player {
         }
         // this.canJump = false; // TODO: turn on this logic and update the update method
         break;
+
+      case "ShiftLeft":
+        this.speed = 2;
     }
   }
 
