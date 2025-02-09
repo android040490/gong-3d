@@ -7,6 +7,9 @@ import {
   Collider,
   Vector,
   JointData,
+  RayColliderHit,
+  InteractionGroups,
+  QueryFilterFlags,
 } from "@dimforge/rapier3d";
 
 interface BoxShape {
@@ -86,6 +89,31 @@ export default class PhysicalWorld {
     const jointParams = RAPIER.JointData.revolute(anchor1, anchor2, axis);
 
     return jointParams;
+  }
+
+  castRay(
+    origin: Vector,
+    direction: Vector,
+    maxToi: number = 1,
+    solid: boolean = true,
+    filterFlags?: QueryFilterFlags,
+    filterGroups?: InteractionGroups,
+    filterExcludeCollider?: Collider,
+    filterExcludeRigidBody?: RigidBody,
+    filterPredicate?: (collider: Collider) => boolean,
+  ): RayColliderHit | null {
+    let ray = new RAPIER.Ray(origin, direction);
+
+    return this._instance.castRay(
+      ray,
+      maxToi,
+      solid,
+      filterFlags,
+      filterGroups,
+      filterExcludeCollider,
+      filterExcludeRigidBody,
+      filterPredicate,
+    );
   }
 
   update() {

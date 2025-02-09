@@ -95,6 +95,24 @@ export default class Player {
         newPosition.z,
       );
 
+      const hit = this.physicalWorld.castRay(
+        this.body.rigidBody.translation(),
+        {
+          x: 0.0,
+          y: -1.5,
+          z: 0.0,
+        },
+        1,
+        true,
+        undefined,
+        undefined,
+        this.body.collider,
+      );
+
+      if (hit?.collider) {
+        this.canJump = true;
+      }
+
       this.body.update();
     }
   }
@@ -181,7 +199,7 @@ export default class Player {
             true,
           );
         }
-        // this.canJump = false; // TODO: turn on this logic and update the update method
+        this.canJump = false;
         break;
 
       case "ShiftLeft":
