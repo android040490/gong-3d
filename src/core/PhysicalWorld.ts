@@ -42,7 +42,7 @@ type RigidBodyType =
   | "kinematicPositionBased";
 
 interface RigidBodyParams {
-  rigidBodyType?: RigidBodyType;
+  rigidBodyType: RigidBodyType;
   position?: {
     x: number;
     y: number;
@@ -65,13 +65,10 @@ export default class PhysicalWorld {
 
   createObject(params: PhysicalObjectParams): {
     collider: Collider;
-    rigidBody?: RigidBody;
+    rigidBody: RigidBody;
   } {
-    let rigidBody: RigidBody | undefined;
     const rigidBodyDesc = this.createRigidBodyDesc(params);
-    if (rigidBodyDesc) {
-      rigidBody = this._instance.createRigidBody(rigidBodyDesc);
-    }
+    const rigidBody = this._instance.createRigidBody(rigidBodyDesc);
 
     const collider: Collider = this._instance.createCollider(
       this.createColliderDesc(params),
@@ -95,9 +92,7 @@ export default class PhysicalWorld {
     this._instance.step();
   }
 
-  private createRigidBodyDesc(
-    params: RigidBodyParams,
-  ): RigidBodyDesc | undefined {
+  private createRigidBodyDesc(params: RigidBodyParams): RigidBodyDesc {
     const { position, rigidBodyType } = params;
     const { x, y, z } = position ?? { x: 0, y: 0, z: 0 };
 
@@ -119,10 +114,8 @@ export default class PhysicalWorld {
       case "kinematicVelocityBased":
         bodyDesc = RAPIER.RigidBodyDesc.kinematicVelocityBased();
         break;
-
-      default:
-        return;
     }
+
     bodyDesc.setTranslation(x, y, z);
 
     bodyDesc.setCcdEnabled(true);

@@ -139,7 +139,7 @@ export default class Gong extends Entity {
   private createPlate(): void {
     const plate = new PhysicalEntity({
       shape: { type: "cylinder", radius: 3, height: 0.2 },
-      density: 30,
+      density: 20,
       rigidBodyType: "dynamic",
       position: { x: 0, y: 4.7, z: 0 },
       geometry: new THREE.CylinderGeometry(0, 3, 0.2, 64, 128, true),

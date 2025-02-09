@@ -11,7 +11,7 @@ interface PhysicalEntityParams extends PhysicalObjectParams, SceneObjectParams {
 export default class PhysicalEntity extends SceneObject {
   private physicalWorld: PhysicalWorld;
   public collider!: Collider;
-  public rigidBody?: RigidBody;
+  public rigidBody!: RigidBody;
 
   constructor(params: PhysicalEntityParams) {
     super(params);
