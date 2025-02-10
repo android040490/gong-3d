@@ -10,6 +10,7 @@ import Debug from "./Utils/Debug";
 import eventsManager, { EventsManager } from "./Utils/EventsManager";
 import PhysicalWorld from "./PhysicalWorld";
 import Player from "./World/Player";
+import PlayerInputHandler from "./PlayerInputHandler";
 
 let instance: Experience;
 
@@ -51,6 +52,7 @@ export default class Experience {
     this.physicalWorld = new PhysicalWorld();
     this.world = new World();
     this.player = new Player();
+    new PlayerInputHandler(this.player);
     // this.scene.fog = new THREE.Fog(0xf9efa9, 0, 200);
 
     // Sizes resize event

@@ -14,14 +14,14 @@ export default class Player {
   private physicalWorld: PhysicalWorld;
   private characterController!: KinematicCharacterController;
   private body!: PhysicalEntity;
-  private moveForward = false;
-  private moveLeft = false;
-  private moveBackward = false;
-  private moveRight = false;
-  private canJump = true;
+  private _moveForward = false;
+  private _moveLeft = false;
+  private _moveBackward = false;
+  private _moveRight = false;
+  private _canJump = true;
+  private _speed = 1;
   private height = 3; // player height
   private velocity = new THREE.Vector3();
-  private speed = 1;
 
   constructor() {
     const experience = new Experience();
@@ -32,7 +32,40 @@ export default class Player {
 
     this.setPhysicalBody();
     this.setCharacterController();
-    this.setListeners();
+  }
+
+  set moveForward(value: boolean) {
+    this._moveForward = value;
+  }
+
+  set moveBackward(value: boolean) {
+    this._moveBackward = value;
+  }
+
+  set moveLeft(value: boolean) {
+    this._moveLeft = value;
+  }
+
+  set moveRight(value: boolean) {
+    this._moveRight = value;
+  }
+
+  accelerate(value: boolean): void {
+    this._speed = value ? 2 : 1;
+  }
+
+  jump(): void {
+    if (this._canJump === true) {
+      this.body.rigidBody.applyImpulse(
+        {
+          x: 0,
+          y: 2000,
+          z: 0,
+        },
+        true,
+      );
+    }
+    this._canJump = false;
   }
 
   update() {
@@ -49,16 +82,16 @@ export default class Player {
 
       const direction = new THREE.Vector3();
 
-      direction.z = Number(this.moveBackward) - Number(this.moveForward);
-      direction.x = Number(this.moveRight) - Number(this.moveLeft);
+      direction.z = Number(this._moveBackward) - Number(this._moveForward);
+      direction.x = Number(this._moveRight) - Number(this._moveLeft);
       direction.normalize(); // this ensures consistent movements in all directions
 
-      if (this.moveForward || this.moveBackward) {
-        this.velocity.z += direction.z * 2 * delta * this.speed;
+      if (this._moveForward || this._moveBackward) {
+        this.velocity.z += direction.z * 2 * delta * this._speed;
       }
 
-      if (this.moveLeft || this.moveRight) {
-        this.velocity.x += direction.x * 2 * delta * this.speed;
+      if (this._moveLeft || this._moveRight) {
+        this.velocity.x += direction.x * 2 * delta * this._speed;
       }
 
       const movement = this.velocity
@@ -89,29 +122,18 @@ export default class Player {
         },
         true,
       );
+      const cameraDir = this.camera.instance.quaternion;
+      this.body.rigidBody.setRotation(
+        { x: 0, y: cameraDir.y, z: cameraDir.z, w: cameraDir.w },
+        true,
+      );
       this.camera.controls.object.position.set(
         newPosition.x,
         newPosition.y + 1,
         newPosition.z,
       );
 
-      const hit = this.physicalWorld.castRay(
-        this.body.rigidBody.translation(),
-        {
-          x: 0.0,
-          y: -1.5,
-          z: 0.0,
-        },
-        1,
-        true,
-        undefined,
-        undefined,
-        this.body.collider,
-      );
-
-      if (hit?.collider) {
-        this.canJump = true;
-      }
+      this.detectGround();
 
       this.body.update();
     }
@@ -139,106 +161,48 @@ export default class Player {
     this.body.rigidBody.setTranslation(this.camera.instance.position, true);
   }
 
-  private onKeyUp(event: KeyboardEvent): void {
-    switch (event.code) {
-      case "ArrowUp":
-      case "KeyW":
-        this.moveForward = false;
-        break;
+  private detectGround(): void {
+    const hit = this.physicalWorld.castRay(
+      this.body.rigidBody.translation(),
+      {
+        x: 0.0,
+        y: -this.height / 2,
+        z: 0.0,
+      },
+      1,
+      true,
+      undefined,
+      undefined,
+      this.body.collider,
+    );
 
-      case "ArrowLeft":
-      case "KeyA":
-        this.moveLeft = false;
-        break;
-
-      case "ArrowDown":
-      case "KeyS":
-        this.moveBackward = false;
-        break;
-
-      case "ArrowRight":
-      case "KeyD":
-        this.moveRight = false;
-        break;
-
-      case "ShiftLeft":
-        this.speed = 1;
+    if (hit?.collider) {
+      this._canJump = true;
     }
   }
 
-  private onKeyDown(event: KeyboardEvent): void {
-    switch (event.code) {
-      case "ArrowUp":
-      case "KeyW":
-        this.moveForward = true;
-        break;
-
-      case "ArrowLeft":
-      case "KeyA":
-        this.moveLeft = true;
-        break;
-
-      case "ArrowDown":
-      case "KeyS":
-        this.moveBackward = true;
-        break;
-
-      case "ArrowRight":
-      case "KeyD":
-        this.moveRight = true;
-        break;
-
-      case "Space":
-        if (this.canJump === true) {
-          this.body.rigidBody.applyImpulse(
-            {
-              x: 0,
-              y: 2000,
-              z: 0,
-            },
-            true,
-          );
-        }
-        this.canJump = false;
-        break;
-
-      case "ShiftLeft":
-        this.speed = 2;
-    }
-  }
-
-  private throwObject(): void {
-    const cameraDirection = this.camera.controls.getDirection(
+  throwObject(): void {
+    const cameraDirection = this.camera.instance.getWorldDirection(
       new THREE.Vector3(0, 0, 0),
     );
-    const cameraPosition = this.camera.instance.position
+    const position = this.camera.instance.position
       .clone()
-      .add(cameraDirection.clone().normalize().multiplyScalar(2));
+      .add(cameraDirection.clone().multiplyScalar(2));
 
     const randomObj = new PhysicalEntity({
-      shape: { type: "sphere", radius: 0.5 },
-      density: 10,
-      restitution: 1.7,
+      shape: { type: "box", sizes: { x: 5, y: 1, z: 5 } },
+      density: 1000,
+      // restitution: 1.7,
       rigidBodyType: "dynamic",
-      position: cameraPosition,
-      geometry: new THREE.SphereGeometry(0.5, 16, 16),
+      position,
+      geometry: new THREE.BoxGeometry(5, 1, 5),
       material: new THREE.MeshStandardMaterial({ color: "#00f" }),
     });
 
-    cameraDirection.multiplyScalar(2000);
+    cameraDirection.multiplyScalar(200);
     randomObj.rigidBody.applyImpulse(cameraDirection, true);
     randomObj.rigidBody.setLinearDamping(0.2);
 
     this.world.addObject(randomObj);
-  }
-
-  private setListeners(): void {
-    document.addEventListener("keydown", (e: KeyboardEvent) =>
-      this.onKeyDown(e),
-    );
-    document.addEventListener("keyup", (e: KeyboardEvent) => this.onKeyUp(e));
-    document.addEventListener("click", () => {
-      if (this.camera.controls.isLocked === true) this.throwObject();
-    });
   }
 }
