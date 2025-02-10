@@ -111,25 +111,28 @@ export default class Gong extends Entity {
 
   private createColumns(): void {
     const columnsPositions = [
-      { position: { x: -4, y: 5, z: 0 } },
-      { position: { x: 4, y: 5, z: 0 } },
+      { position: { x: -4, y: 4, z: 0 } },
+      { position: { x: 4, y: 4, z: 0 } },
       {
-        position: { x: 0, y: 10, z: 0 },
+        position: { x: 0, y: 8, z: 0 },
         rotation: { x: 0, y: 0, z: 1, w: Math.PI / 2 },
       },
     ];
 
     columnsPositions.forEach(({ position, rotation }) => {
+      const mesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.2, 0.2, 10, 16),
+        new THREE.MeshStandardMaterial({
+          map: this.baulkColorTexture,
+          normalMap: this.baulkNormalTexture,
+        }),
+      );
       const column = new PhysicalEntity({
         shape: { type: "cylinder", radius: 0.2, height: 10 },
         rigidBodyType: "fixed",
         position,
         rotation,
-        geometry: new THREE.CylinderGeometry(0.2, 0.2, 10, 16),
-        material: new THREE.MeshStandardMaterial({
-          map: this.baulkColorTexture,
-          normalMap: this.baulkNormalTexture,
-        }),
+        mesh,
       });
 
       this.children.push(column);
@@ -137,13 +140,9 @@ export default class Gong extends Entity {
   }
 
   private createPlate(): void {
-    const plate = new PhysicalEntity({
-      shape: { type: "cylinder", radius: 3, height: 0.2 },
-      density: 20,
-      rigidBodyType: "dynamic",
-      position: { x: 0, y: 4.7, z: 0 },
-      geometry: new THREE.CylinderGeometry(0, 3, 0.2, 64, 128, true),
-      material: new THREE.MeshStandardMaterial({
+    const mesh = new THREE.Mesh(
+      new THREE.CylinderGeometry(0, 3, 0.2, 64, 128, true),
+      new THREE.MeshStandardMaterial({
         map: this.plateColorTexture,
         normalMap: this.plateNormalTexture,
         roughnessMap: this.plateRoughnessTexture,
@@ -153,6 +152,13 @@ export default class Gong extends Entity {
         metalness: 0.5,
         side: THREE.DoubleSide,
       }),
+    );
+    const plate = new PhysicalEntity({
+      shape: { type: "cylinder", radius: 3, height: 0.2 },
+      density: 1,
+      rigidBodyType: "dynamic",
+      position: { x: 0, y: 4.7, z: 0 },
+      mesh,
       rotation: { x: 1, y: 0, z: 0, w: Math.PI / 2 },
     });
 

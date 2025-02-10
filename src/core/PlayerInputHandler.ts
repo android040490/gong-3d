@@ -57,7 +57,7 @@ export default class PlayerInputHandler {
     );
     document.addEventListener("click", () => {
       if (this.camera.controls.isLocked === true) {
-        this.player.throwObject();
+        this.player.hit();
       }
     });
   }

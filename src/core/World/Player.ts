@@ -6,20 +6,24 @@ import World from "./World";
 import PhysicalWorld from "../PhysicalWorld";
 import PhysicalEntity from "../models/PhysicalEntity";
 import { KinematicCharacterController } from "@dimforge/rapier3d";
+import Hammer from "./Hammer";
 
 export default class Player {
+  private readonly minSpeed = 0.5;
+  private readonly maxSpeed = 2;
+  private _speed: number;
   private time: Time;
   private camera: Camera;
   private world: World;
   private physicalWorld: PhysicalWorld;
   private characterController!: KinematicCharacterController;
   private body!: PhysicalEntity;
+  private hammer!: Hammer;
   private _moveForward = false;
   private _moveLeft = false;
   private _moveBackward = false;
   private _moveRight = false;
   private _canJump = true;
-  private _speed = 1;
   private height = 3; // player height
   private velocity = new THREE.Vector3();
 
@@ -30,7 +34,10 @@ export default class Player {
     this.world = experience.world;
     this.physicalWorld = experience.physicalWorld;
 
+    this._speed = this.minSpeed;
+
     this.setPhysicalBody();
+    this.addHummer();
     this.setCharacterController();
   }
 
@@ -51,7 +58,7 @@ export default class Player {
   }
 
   accelerate(value: boolean): void {
-    this._speed = value ? 2 : 1;
+    this._speed = value ? this.maxSpeed : this.minSpeed;
   }
 
   jump(): void {
@@ -66,6 +73,10 @@ export default class Player {
       );
     }
     this._canJump = false;
+  }
+
+  hit(): void {
+    this.hammer.hit();
   }
 
   update() {
@@ -122,6 +133,7 @@ export default class Player {
         },
         true,
       );
+
       const cameraDir = this.camera.instance.quaternion;
       this.body.rigidBody.setRotation(
         { x: 0, y: cameraDir.y, z: cameraDir.z, w: cameraDir.w },
@@ -136,6 +148,7 @@ export default class Player {
       this.detectGround();
 
       this.body.update();
+      this.hammer.update();
     }
   }
 
@@ -149,16 +162,27 @@ export default class Player {
   }
 
   private setPhysicalBody(): void {
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(1, this.height, 1),
+      new THREE.MeshStandardMaterial({
+        color: "#00f",
+        // opacity: 0,
+        // transparent: true,
+      }),
+    );
     this.body = new PhysicalEntity({
       shape: { type: "box", sizes: { x: 1, y: this.height, z: 1 } },
       density: 100,
       rigidBodyType: "dynamic",
       position: { x: 10, y: this.height / 2, z: 5 },
-      geometry: new THREE.BoxGeometry(1, this.height, 1),
-      material: new THREE.MeshStandardMaterial({ color: "#00f" }),
+      mesh,
     });
     this.body.rigidBody.lockRotations(true, true);
     this.body.rigidBody.setTranslation(this.camera.instance.position, true);
+  }
+
+  private addHummer(): void {
+    this.hammer = new Hammer(this.body);
   }
 
   private detectGround(): void {
@@ -189,14 +213,17 @@ export default class Player {
       .clone()
       .add(cameraDirection.clone().multiplyScalar(2));
 
+    const mesh = new THREE.Mesh(
+      new THREE.BoxGeometry(5, 1, 5),
+      new THREE.MeshStandardMaterial({ color: "#00f" }),
+    );
     const randomObj = new PhysicalEntity({
       shape: { type: "box", sizes: { x: 5, y: 1, z: 5 } },
       density: 1000,
       // restitution: 1.7,
       rigidBodyType: "dynamic",
       position,
-      geometry: new THREE.BoxGeometry(5, 1, 5),
-      material: new THREE.MeshStandardMaterial({ color: "#00f" }),
+      mesh,
     });
 
     cameraDirection.multiplyScalar(200);
