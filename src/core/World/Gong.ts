@@ -4,6 +4,7 @@ import PhysicalEntity from "../models/PhysicalEntity";
 import Resources from "../Utils/Resources";
 import Experience from "../Experience";
 import PhysicalWorld from "../PhysicalWorld";
+import RAPIER from "@dimforge/rapier3d";
 
 export default class Gong extends Entity {
   private children: PhysicalEntity[] = [];
@@ -16,6 +17,7 @@ export default class Gong extends Entity {
   private plateMetallicTexture?: THREE.Texture;
   private plateRoughnessTexture?: THREE.Texture;
   private physicalWorld: PhysicalWorld;
+  private gongPlate?: PhysicalEntity;
 
   constructor() {
     super();
@@ -31,6 +33,13 @@ export default class Gong extends Entity {
 
   update(): void {
     this.children.forEach((child) => child.update());
+
+    this.physicalWorld.eventQueue.drainContactForceEvents((event) => {
+      const force = event.maxForceMagnitude();
+      if (force > 200) {
+        this.playSound(force);
+      }
+    });
   }
 
   private async loadTextures(): Promise<void> {
@@ -111,8 +120,8 @@ export default class Gong extends Entity {
 
   private createColumns(): void {
     const columnsPositions = [
-      { position: { x: -4, y: 4, z: 0 } },
-      { position: { x: 4, y: 4, z: 0 } },
+      { position: { x: -4, y: 3, z: 0 } },
+      { position: { x: 4, y: 3, z: 0 } },
       {
         position: { x: 0, y: 8, z: 0 },
         rotation: { x: 0, y: 0, z: 1, w: Math.PI / 2 },
@@ -161,6 +170,7 @@ export default class Gong extends Entity {
       mesh,
       rotation: { x: 1, y: 0, z: 0, w: Math.PI / 2 },
     });
+    plate.collider.setActiveEvents(RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS);
 
     const baulkRigidBody = this.children[2]?.rigidBody; // get baulk by index
     if (plate.rigidBody && baulkRigidBody) {
@@ -179,6 +189,15 @@ export default class Gong extends Entity {
       );
     }
 
-    this.children.push(plate);
+    this.gongPlate = plate;
+
+    this.children.push(this.gongPlate);
+  }
+
+  private playSound(force: number): void {
+    const volume = Math.min(force / 1000, 1);
+    const audio = new Audio("sound/gong-sound.mp3");
+    audio.volume = volume;
+    audio.play();
   }
 }

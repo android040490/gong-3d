@@ -10,6 +10,7 @@ import {
   RayColliderHit,
   InteractionGroups,
   QueryFilterFlags,
+  EventQueue,
 } from "@dimforge/rapier3d";
 
 interface BoxShape {
@@ -57,13 +58,19 @@ export type PhysicalObjectParams = RigidBodyParams & ColliderParams;
 
 export default class PhysicalWorld {
   private _instance: World;
+  private _eventQueue: EventQueue;
 
   constructor() {
     this._instance = new RAPIER.World({ x: 0, y: -9.81, z: 0 });
+    this._eventQueue = new RAPIER.EventQueue(true);
   }
 
   get instance(): World {
     return this._instance;
+  }
+
+  get eventQueue(): EventQueue {
+    return this._eventQueue;
   }
 
   createObject(params: PhysicalObjectParams): {
@@ -117,7 +124,7 @@ export default class PhysicalWorld {
   }
 
   update() {
-    this._instance.step();
+    this._instance.step(this._eventQueue);
   }
 
   private createRigidBodyDesc(params: RigidBodyParams): RigidBodyDesc {

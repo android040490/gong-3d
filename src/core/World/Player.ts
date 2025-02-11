@@ -9,7 +9,7 @@ import { KinematicCharacterController } from "@dimforge/rapier3d";
 import Hammer from "./Hammer";
 
 export default class Player {
-  private readonly minSpeed = 0.5;
+  private readonly minSpeed = 0.3;
   private readonly maxSpeed = 2;
   private _speed: number;
   private time: Time;

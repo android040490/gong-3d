@@ -14,8 +14,8 @@ export default class Hammer {
   private hammerHandleRoughnessTexture?: THREE.Texture;
   private resources: Resources;
   private parent: PhysicalEntity;
-  private minAngle = (-50 * Math.PI) / 180;
-  private maxAngle = (50 * Math.PI) / 180;
+  private minAngle = (-60 * Math.PI) / 180;
+  private maxAngle = (40 * Math.PI) / 180;
   private joint!: RevoluteImpulseJoint;
   private object!: PhysicalEntity;
 
@@ -40,7 +40,7 @@ export default class Hammer {
   }
 
   hit(): void {
-    this.joint.configureMotorPosition(this.minAngle, 250.0, 20);
+    this.joint.configureMotorPosition(this.minAngle, 950.0, 20);
     setTimeout(() => {
       this.joint.configureMotorPosition(this.maxAngle, 250.0, 80);
     }, 150);
@@ -49,7 +49,7 @@ export default class Hammer {
   private setPhysicalObject(): void {
     const bodyPosition = this.parent.rigidBody.translation();
     const hammerHandle = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.05, 0.05, 1.2),
+      new THREE.CylinderGeometry(0.05, 0.05, 1.5),
       new THREE.MeshStandardMaterial({
         map: this.hammerHandleColorTexture,
         normalMap: this.hammerHandleNormalTexture,
@@ -57,7 +57,7 @@ export default class Hammer {
       }),
     );
     const hammerHead = new THREE.Mesh(
-      new THREE.CapsuleGeometry(0.15, 0.15, 4),
+      new THREE.SphereGeometry(0.2, 16, 16),
       new THREE.MeshStandardMaterial({
         map: this.hammerHeadColorTexture,
         normalMap: this.hammerHeadNormalTexture,
@@ -65,10 +65,10 @@ export default class Hammer {
       }),
     );
     hammerHandle.add(hammerHead);
-    hammerHead.position.set(0, 0.51, 0);
+    hammerHead.position.set(0, 0.6, 0);
 
     this.object = new PhysicalEntity({
-      shape: { type: "box", sizes: { x: 0.1, y: 1.2, z: 0.1 } },
+      shape: { type: "cylinder", radius: 0.05, height: 1.5 },
       density: 200,
       rigidBodyType: "dynamic",
       position: {
@@ -83,8 +83,8 @@ export default class Hammer {
   private setJoint(): void {
     let x = { x: 1, y: 0, z: 0 };
     const jointParams = this.physicalWorld.createRevoluteJointData(
-      { x: 0.2, y: 0.8, z: -1.3 },
-      { x: 0, y: -0.2, z: 0 },
+      { x: 0.2, y: 0.4, z: -1.7 },
+      { x: 0, y: -0.6, z: 0 },
       x,
     );
 
