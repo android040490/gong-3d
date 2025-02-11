@@ -190,7 +190,7 @@ export default class Player {
       this.body.rigidBody.translation(),
       {
         x: 0.0,
-        y: -this.height / 2,
+        y: -this.height / 2 - 0.01,
         z: 0.0,
       },
       1,
