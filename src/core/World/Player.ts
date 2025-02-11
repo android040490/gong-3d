@@ -166,8 +166,8 @@ export default class Player {
       new THREE.BoxGeometry(1, this.height, 1),
       new THREE.MeshStandardMaterial({
         color: "#00f",
-        // opacity: 0,
-        // transparent: true,
+        opacity: 0,
+        transparent: true,
       }),
     );
     this.body = new PhysicalEntity({

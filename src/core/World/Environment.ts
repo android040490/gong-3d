@@ -17,7 +17,7 @@ export default class Environment {
   private sunLight!: THREE.DirectionalLight;
   private ambientLight!: THREE.AmbientLight;
   private sky!: Sky;
-  private phi = THREE.MathUtils.degToRad(90);
+  private phi = THREE.MathUtils.degToRad(80);
   private theta = THREE.MathUtils.degToRad(50);
 
   constructor() {
