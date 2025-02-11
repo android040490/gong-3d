@@ -1,21 +1,17 @@
 import * as THREE from "three";
 import Experience from "../Experience";
 
-export interface SceneObjectParams {
-  geometry: THREE.BufferGeometry;
-  material: THREE.Material;
-}
+export type SceneObjectParams = {
+  mesh: THREE.Mesh;
+};
 
 export default class SceneObject {
   private readonly scene: THREE.Scene;
-  private _mesh!: THREE.Mesh;
-  private geometry: THREE.BufferGeometry;
-  private material: THREE.Material;
+  private _mesh: THREE.Mesh;
 
   constructor(params: SceneObjectParams) {
-    const { geometry, material } = params;
-    this.geometry = geometry;
-    this.material = material;
+    const { mesh } = params;
+    this._mesh = mesh;
 
     this.scene = new Experience().scene;
 
@@ -27,8 +23,7 @@ export default class SceneObject {
   }
 
   private setMesh() {
-    this._mesh = new THREE.Mesh(this.geometry, this.material);
-
-    this.scene.add(this.mesh);
+    this._mesh.castShadow = true;
+    this.scene.add(this._mesh);
   }
 }

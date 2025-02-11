@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import Experience from "./Experience";
-import { OrbitControls } from "three/addons/Addons.js";
+import { PointerLockControls } from "three/addons/Addons.js";
 import Sizes from "./Utils/Sizes";
 
 export default class Camera {
@@ -8,7 +8,7 @@ export default class Camera {
   private readonly sizes: Sizes;
   private readonly scene: THREE.Scene;
   private readonly canvas: HTMLCanvasElement;
-  private controls!: OrbitControls;
+  private _controls!: PointerLockControls;
 
   instance!: THREE.PerspectiveCamera;
 
@@ -28,12 +28,16 @@ export default class Camera {
     this.instance.updateProjectionMatrix();
   }
 
-  update(): void {
-    this.controls.update();
+  get controls(): PointerLockControls {
+    return this._controls;
   }
 
+  // update(): void {
+  //   this.controls.update();
+  // }
+
   dispose(): void {
-    this.controls.dispose();
+    this._controls.dispose();
   }
 
   private setInstance(): void {
@@ -44,13 +48,12 @@ export default class Camera {
       1000,
     );
 
-    this.instance.position.set(0, 3, 10);
+    this.instance.position.set(0, 5, 30);
     this.instance.lookAt(0, 0, 0);
     this.scene.add(this.instance);
   }
 
   private setControls(): void {
-    this.controls = new OrbitControls(this.instance, this.canvas);
-    this.controls.enableDamping = true;
+    this._controls = new PointerLockControls(this.instance, this.canvas);
   }
 }

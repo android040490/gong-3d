@@ -17,6 +17,7 @@ export class Root extends HTMLElement {
     this.innerHTML = `
       <div>
         <splash-screen></splash-screen>
+        <blocker-layer></blocker-layer>
       </div>
     `;
   }

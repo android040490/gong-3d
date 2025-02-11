@@ -1,4 +1,4 @@
-# Starter for Three js project with typescript
+# 3D gong
 
 ## Setup
 

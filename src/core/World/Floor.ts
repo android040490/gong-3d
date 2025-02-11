@@ -27,12 +27,13 @@ export default class Floor {
   }
 
   private setPhysicalBody(): void {
-    this.experience.physicalWorld
-      .createObject({
-        shape: { type: "cylinder", radius: this.size, height: 0.5 },
-        position: { x: 0, y: -0.5, z: 0 },
-      })
-      .setTranslation({ x: 0, y: -0.25, z: 0 });
+    const { rigidBody } = this.experience.physicalWorld.createObject({
+      shape: { type: "cylinder", radius: this.size, height: 0.5 },
+      position: { x: 0, y: -0.5, z: 0 },
+      rigidBodyType: "fixed",
+    });
+    rigidBody.setTranslation({ x: 0, y: -0.25, z: 0 }, true);
+    // collider.setFriction(1);
   }
 
   private init(): void {

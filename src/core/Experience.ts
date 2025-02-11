@@ -9,6 +9,8 @@ import Resources from "./Utils/Resources";
 import Debug from "./Utils/Debug";
 import eventsManager, { EventsManager } from "./Utils/EventsManager";
 import PhysicalWorld from "./PhysicalWorld";
+import Player from "./World/Player";
+import PlayerInputHandler from "./PlayerInputHandler";
 
 let instance: Experience;
 
@@ -24,6 +26,7 @@ export default class Experience {
   public readonly world!: World;
   public readonly physicalWorld!: PhysicalWorld;
   private readonly eventsManager: EventsManager = eventsManager;
+  private player!: Player;
 
   private stats?: Stats;
 
@@ -48,6 +51,9 @@ export default class Experience {
     this.renderer = new Renderer();
     this.physicalWorld = new PhysicalWorld();
     this.world = new World();
+    this.player = new Player();
+    new PlayerInputHandler(this.player);
+    // this.scene.fog = new THREE.Fog(0xf9efa9, 0, 200);
 
     // Sizes resize event
     this.eventsManager.on(SizesEvent.Resize, () => {
@@ -100,8 +106,9 @@ export default class Experience {
       this.stats?.begin();
     }
     this.physicalWorld.update();
-    this.camera.update();
+    // this.camera.update();
     this.world.update();
+    this.player.update();
     this.renderer.update();
     if (this.debug.active) {
       this.stats?.end();
