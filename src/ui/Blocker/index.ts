@@ -30,8 +30,10 @@ export class Blocker extends HTMLElement {
           <p>
             Move: WASD<br />
             Jump: SPACE<br />
-            Look: MOUSE
+            Run: SHIFT<br />
+            Look: MOUSE<br />
           </p>
+          <p>To unlock the mouse pointer, press Esc</p>
         </div>
       </div>
     `;
