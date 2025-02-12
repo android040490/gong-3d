@@ -120,6 +120,7 @@ export default class Environment {
       this.texture.colorSpace = THREE.SRGBColorSpace;
       this.texture.mapping = THREE.EquirectangularReflectionMapping;
       this.scene.background = this.texture;
+      this.scene.backgroundRotation = new THREE.Euler(0, 0, Math.PI * 0.5);
     }
   }
 

@@ -54,11 +54,11 @@ export default class Gong extends Entity {
     ] = await this.resources.loadTextures([
       "textures/baulk/color.jpg",
       "textures/baulk/normal.jpg",
-      "textures/gong-plate-2/color.jpg",
-      "textures/gong-plate-2/normal.jpg",
-      "textures/gong-plate-2/metallic.jpg",
-      "textures/gong-plate-2/roughness.jpg",
-      "textures/gong-plate-2/ambientOcclusion.jpg",
+      "textures/gong-plate-7/color.jpg",
+      "textures/gong-plate-7/normal.jpg",
+      "textures/gong-plate-7/metallic.jpg",
+      "textures/gong-plate-7/roughness.jpg",
+      "textures/gong-plate-7/ambientOcclusion.jpg",
     ]);
 
     this.baulkColorTexture = baulkColorTexture;
@@ -88,31 +88,27 @@ export default class Gong extends Entity {
     }
     if (this.plateColorTexture) {
       this.plateColorTexture.colorSpace = THREE.SRGBColorSpace;
-      this.plateColorTexture.repeat.set(2, 2);
+      this.plateColorTexture.repeat.set(3, 3);
       this.plateColorTexture.wrapS = THREE.RepeatWrapping;
       this.plateColorTexture.wrapT = THREE.RepeatWrapping;
     }
     if (this.plateNormalTexture) {
-      this.plateNormalTexture.colorSpace = THREE.SRGBColorSpace;
-      this.plateNormalTexture.repeat.set(2, 2);
+      this.plateNormalTexture.repeat.set(3, 3);
       this.plateNormalTexture.wrapS = THREE.RepeatWrapping;
       this.plateNormalTexture.wrapT = THREE.RepeatWrapping;
     }
     if (this.plateRoughnessTexture) {
-      this.plateRoughnessTexture.colorSpace = THREE.SRGBColorSpace;
-      this.plateRoughnessTexture.repeat.set(2, 2);
+      this.plateRoughnessTexture.repeat.set(3, 3);
       this.plateRoughnessTexture.wrapS = THREE.RepeatWrapping;
       this.plateRoughnessTexture.wrapT = THREE.RepeatWrapping;
     }
     if (this.plateMetallicTexture) {
-      this.plateMetallicTexture.colorSpace = THREE.SRGBColorSpace;
-      this.plateMetallicTexture.repeat.set(2, 2);
+      this.plateMetallicTexture.repeat.set(3, 3);
       this.plateMetallicTexture.wrapS = THREE.RepeatWrapping;
       this.plateMetallicTexture.wrapT = THREE.RepeatWrapping;
     }
     if (this.plateAmbientOcclusionTexture) {
-      this.plateAmbientOcclusionTexture.colorSpace = THREE.SRGBColorSpace;
-      this.plateAmbientOcclusionTexture.repeat.set(2, 2);
+      this.plateAmbientOcclusionTexture.repeat.set(3, 3);
       this.plateAmbientOcclusionTexture.wrapS = THREE.RepeatWrapping;
       this.plateAmbientOcclusionTexture.wrapT = THREE.RepeatWrapping;
     }

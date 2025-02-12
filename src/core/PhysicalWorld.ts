@@ -153,7 +153,7 @@ export default class PhysicalWorld {
 
     bodyDesc.setTranslation(x, y, z);
 
-    bodyDesc.setCcdEnabled(true);
+    bodyDesc.setCcdEnabled(true); // TODO: can be disabled for slow objects
 
     return bodyDesc;
   }
